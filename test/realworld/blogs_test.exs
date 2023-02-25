@@ -15,6 +15,18 @@ defmodule Realworld.BlogsTest do
       assert Blogs.list_articles() == [article]
     end
 
+    test "list_articles_by_tag/1" do
+      {:ok, %{article: a1}} =
+        Blogs.insert_article_with_tags(%{
+          title: "t", body: "b", tags_string: "Elixir, Phoenix, Nerves, Nx"})
+      {:ok, %{article: a2}} =
+        Blogs.insert_article_with_tags(%{
+          title: "t", body: "b", tags_string: "Elixir"})
+      assert Blogs.list_articles_by_tag("Elixir")
+             |> Enum.map(& &1.id) |> MapSet.new()
+             |> MapSet.equal?(MapSet.new([a1.id, a2.id]))
+    end
+
     test "get_article!/1 returns the article with given id" do
       article = article_fixture()
       assert Blogs.get_article!(article.id) == article
@@ -110,6 +122,60 @@ defmodule Realworld.BlogsTest do
     test "change_comment/1 returns a comment changeset" do
       comment = comment_fixture()
       assert %Ecto.Changeset{} = Blogs.change_comment(comment)
+    end
+  end
+
+  describe "tags" do
+    alias Realworld.Blogs.Tag
+
+    import Realworld.BlogsFixtures
+
+    @invalid_attrs %{tag: nil}
+
+    test "list_tags/0 returns all tags" do
+      tag = tag_fixture()
+      assert Blogs.list_tags() == [tag]
+    end
+
+    test "get_tag!/1 returns the tag with given id" do
+      tag = tag_fixture()
+      assert Blogs.get_tag!(tag.id) == tag
+    end
+
+    test "create_tag/1 with valid data creates a tag" do
+      valid_attrs = %{tag: "some tag"}
+
+      assert {:ok, %Tag{} = tag} = Blogs.create_tag(valid_attrs)
+      assert tag.tag == "some tag"
+    end
+
+    test "create_tag/1 with invalid data returns error changeset" do
+      assert {:error, %Ecto.Changeset{}} = Blogs.create_tag(@invalid_attrs)
+    end
+
+    test "update_tag/2 with valid data updates the tag" do
+      tag = tag_fixture()
+      update_attrs = %{tag: "some updated tag"}
+
+      assert {:ok, %Tag{} = tag} = Blogs.update_tag(tag, update_attrs)
+      assert tag.tag == "some updated tag"
+    end
+
+    test "update_tag/2 with invalid data returns error changeset" do
+      tag = tag_fixture()
+      assert {:error, %Ecto.Changeset{}} = Blogs.update_tag(tag, @invalid_attrs)
+      assert tag == Blogs.get_tag!(tag.id)
+    end
+
+    test "delete_tag/1 deletes the tag" do
+      tag = tag_fixture()
+      assert {:ok, %Tag{}} = Blogs.delete_tag(tag)
+      assert_raise Ecto.NoResultsError, fn -> Blogs.get_tag!(tag.id) end
+    end
+
+    test "change_tag/1 returns a tag changeset" do
+      tag = tag_fixture()
+      assert %Ecto.Changeset{} = Blogs.change_tag(tag)
     end
   end
 end
