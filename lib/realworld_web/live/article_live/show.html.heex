@@ -1,0 +1,27 @@
+<.header>
+  Article <%= @article.id %>
+  <:subtitle>This is a article record from your database.</:subtitle>
+  <:actions>
+    <.link patch={~p"/articles/#{@article}/show/edit"} phx-click={JS.push_focus()}>
+      <.button>Edit article</.button>
+    </.link>
+  </:actions>
+</.header>
+
+<.list>
+  <:item title="Title"><%= @article.title %></:item>
+  <:item title="Body"><%= @article.body %></:item>
+</.list>
+
+<.back navigate={~p"/articles"}>Back to articles</.back>
+
+<.modal :if={@live_action == :edit} id="article-modal" show on_cancel={JS.patch(~p"/articles/#{@article}")}>
+  <.live_component
+    module={RealworldWeb.ArticleLive.FormComponent}
+    id={@article.id}
+    title={@page_title}
+    action={@live_action}
+    article={@article}
+    patch={~p"/articles/#{@article}"}
+  />
+</.modal>
