@@ -14,6 +14,24 @@
 <.list>
   <:item title="Title"><%= @article.title %></:item>
   <:item title="Body"><%= @article.body %></:item>
+  <:item title="Comments">
+    <.table id="comments" rows={@article.comments}>
+      <:col :let={comment} label="Author"><%= comment.author.email %></:col>
+      <:col :let={comment} label="Body"><%= comment.body %></:col>
+    </.table>
+    <.simple_form
+      :if={@current_user}
+      for={@comment_form}
+      id="comment-form"
+      phx-change="validate_comment"
+      phx-submit="post_comment"
+    >
+      <.input field={@comment_form[:body]} type="textarea" />
+      <:actions>
+        <.button phx-disable-with="Posting...">Post comment</.button>
+      </:actions>
+    </.simple_form>
+  </:item>
 </.list>
 
 <.back navigate={~p"/articles"}>Back to articles</.back>

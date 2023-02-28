@@ -30,7 +30,7 @@ defmodule Realworld.BlogsTest do
 
     test "get_article!/1 returns the article with given id" do
       article = article_fixture()
-      assert Blogs.get_article!(article.id) == article
+      assert Blogs.get_article!(article.id) == Realworld.Repo.preload(article, :comments)
     end
 
     test "create_article/1 with valid data creates a article" do
@@ -57,7 +57,7 @@ defmodule Realworld.BlogsTest do
     test "update_article/2 with invalid data returns error changeset" do
       article = article_fixture()
       assert {:error, %Ecto.Changeset{}} = Blogs.update_article(article, @invalid_attrs)
-      assert article == Blogs.get_article!(article.id)
+      assert Realworld.Repo.preload(article, :comments) == Blogs.get_article!(article.id)
     end
 
     test "delete_article/1 deletes the article" do
