@@ -69,6 +69,7 @@ defmodule RealworldWeb.ArticleLive.FormComponent do
   end
 
   defp save_article(socket, :new, article_params) do
+    article_params = Map.put(article_params, "author_id", socket.assigns.current_user.id)
     case Blogs.create_article(article_params) do
       {:ok, article} ->
         notify_parent({:saved, article})

@@ -1,6 +1,6 @@
 <.header>
   Listing Articles
-  <:actions>
+  <:actions :if={@current_user}>
     <.link patch={~p"/articles/new"}>
       <.button>New Article</.button>
     </.link>
@@ -18,15 +18,6 @@
     <div class="sr-only">
       <.link navigate={~p"/articles/#{article}"}>Show</.link>
     </div>
-    <.link patch={~p"/articles/#{article}/edit"}>Edit</.link>
-  </:action>
-  <:action :let={{id, article}}>
-    <.link
-      phx-click={JS.push("delete", value: %{id: article.id}) |> hide("##{id}")}
-      data-confirm="Are you sure?"
-    >
-      Delete
-    </.link>
   </:action>
 </.table>
 
@@ -42,6 +33,7 @@
     title={@page_title}
     action={@live_action}
     article={@article}
+    current_user={@current_user}
     patch={~p"/articles"}
   />
 </.modal>

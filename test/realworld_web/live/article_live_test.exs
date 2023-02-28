@@ -3,6 +3,7 @@ defmodule RealworldWeb.ArticleLiveTest do
 
   import Phoenix.LiveViewTest
   import Realworld.BlogsFixtures
+  import Realworld.AccountsFixtures
 
   @create_attrs %{body: "some body", title: "some title"}
   @update_attrs %{body: "some updated body", title: "some updated title"}
@@ -24,7 +25,10 @@ defmodule RealworldWeb.ArticleLiveTest do
     end
 
     test "saves new article", %{conn: conn} do
-      {:ok, index_live, _html} = live(conn, ~p"/articles")
+      {:ok, index_live, _html} =
+        conn
+        |> log_in_user(user_fixture())
+        |> live(~p"/articles")
 
       assert index_live |> element("a", "New Article") |> render_click() =~
                "New Article"
@@ -44,36 +48,6 @@ defmodule RealworldWeb.ArticleLiveTest do
       html = render(index_live)
       assert html =~ "Article created successfully"
       assert html =~ "some body"
-    end
-
-    test "updates article in listing", %{conn: conn, article: article} do
-      {:ok, index_live, _html} = live(conn, ~p"/articles")
-
-      assert index_live |> element("#articles-#{article.id} a", "Edit") |> render_click() =~
-               "Edit Article"
-
-      assert_patch(index_live, ~p"/articles/#{article}/edit")
-
-      assert index_live
-             |> form("#article-form", article: @invalid_attrs)
-             |> render_change() =~ "can&#39;t be blank"
-
-      assert index_live
-             |> form("#article-form", article: @update_attrs)
-             |> render_submit()
-
-      assert_patch(index_live, ~p"/articles")
-
-      html = render(index_live)
-      assert html =~ "Article updated successfully"
-      assert html =~ "some updated body"
-    end
-
-    test "deletes article in listing", %{conn: conn, article: article} do
-      {:ok, index_live, _html} = live(conn, ~p"/articles")
-
-      assert index_live |> element("#articles-#{article.id} a", "Delete") |> render_click()
-      refute has_element?(index_live, "#articles-#{article.id}")
     end
   end
 
