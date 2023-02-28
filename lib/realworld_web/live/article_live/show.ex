@@ -10,10 +10,17 @@ defmodule RealworldWeb.ArticleLive.Show do
 
   @impl true
   def handle_params(%{"id" => id}, _, socket) do
-    {:noreply,
-     socket
-     |> assign(:page_title, page_title(socket.assigns.live_action))
-     |> assign(:article, Blogs.get_article!(id))}
+    article = Blogs.get_article!(id)
+    %{live_action: action, current_user: user} = socket.assigns
+
+    if action == :edit && article.author_id != user.id do
+      {:noreply, push_navigate(socket, to: ~p"/articles/#{article}")}
+    else
+      {:noreply,
+      socket
+      |> assign(:page_title, page_title(action))
+      |> assign(:article, article)}
+    end
   end
 
   defp page_title(:show), do: "Show Article"

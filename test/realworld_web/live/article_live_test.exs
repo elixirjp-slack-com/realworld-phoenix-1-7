@@ -62,7 +62,10 @@ defmodule RealworldWeb.ArticleLiveTest do
     end
 
     test "updates article within modal", %{conn: conn, article: article} do
-      {:ok, show_live, _html} = live(conn, ~p"/articles/#{article}")
+      {:ok, show_live, _html} =
+        conn
+        |> log_in_user(Realworld.Repo.preload(article, :author).author)
+        |> live(~p"/articles/#{article}")
 
       assert show_live |> element("a", "Edit") |> render_click() =~
                "Edit Article"
