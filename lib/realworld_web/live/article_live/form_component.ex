@@ -21,6 +21,7 @@ defmodule RealworldWeb.ArticleLive.FormComponent do
       >
         <.input field={@form[:title]} type="text" label="Title" />
         <.input field={@form[:body]} type="text" label="Body" />
+        <.input field={@form[:tags_string]} type="text" label="Tags" />
         <:actions>
           <.button phx-disable-with="Saving...">Save Article</.button>
         </:actions>
@@ -54,8 +55,8 @@ defmodule RealworldWeb.ArticleLive.FormComponent do
   end
 
   defp save_article(socket, :edit, article_params) do
-    case Blogs.update_article(socket.assigns.article, article_params) do
-      {:ok, article} ->
+    case Blogs.insert_or_update_article_with_tags(socket.assigns.article, article_params) do
+      {:ok, %{article: article}} ->
         notify_parent({:saved, article})
 
         {:noreply,
@@ -70,8 +71,8 @@ defmodule RealworldWeb.ArticleLive.FormComponent do
 
   defp save_article(socket, :new, article_params) do
     article_params = Map.put(article_params, "author_id", socket.assigns.current_user.id)
-    case Blogs.create_article(article_params) do
-      {:ok, article} ->
+    case Blogs.insert_article_with_tags(article_params) do
+      {:ok, %{article: article}} ->
         notify_parent({:saved, article})
 
         {:noreply,

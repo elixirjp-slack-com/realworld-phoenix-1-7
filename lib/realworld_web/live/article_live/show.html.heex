@@ -14,6 +14,7 @@
 <.list>
   <:item title="Title"><%= @article.title %></:item>
   <:item title="Body"><%= @article.body %></:item>
+  <:item title="Tags"><RealworldWeb.ArticleComponents.tags article={@article} /></:item>
   <:item title="Comments">
     <.table id="comments" rows={@article.comments}>
       <:col :let={comment} label="Author"><%= comment.author.email %></:col>

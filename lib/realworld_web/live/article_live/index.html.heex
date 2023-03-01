@@ -7,6 +7,18 @@
   </:actions>
 </.header>
 
+<div class="flex gap-2">
+  Search by tag:
+  <.link
+    :for={%{tag: tag} <- @tags}
+    href={~p"/articles?tag=#{tag}"}
+    class="underline"
+  >
+    <%= tag %>
+  </.link>
+  <.link href={~p"/articles"} class="text-yellow-700">Reset</.link>
+</div>
+
 <.table
   id="articles"
   rows={@streams.articles}
@@ -14,6 +26,7 @@
 >
   <:col :let={{_id, article}} label="Title"><%= article.title %></:col>
   <:col :let={{_id, article}} label="Body"><%= article.body %></:col>
+  <:col :let={{_id, article}} label="Tags"><RealworldWeb.ArticleComponents.tags article={article} /></:col>
   <:action :let={{_id, article}}>
     <div class="sr-only">
       <.link navigate={~p"/articles/#{article}"}>Show</.link>

@@ -14,14 +14,37 @@ defmodule RealworldWeb.ArticleLiveTest do
     %{article: article}
   end
 
+  defp create_article_with_tag(_) do
+    {:ok, %{article: article}} =
+      Realworld.Blogs.insert_article_with_tags(%{
+        title: "some title",
+        body: "some body",
+        author_id: user_fixture().id,
+        tags_string: "test"
+      })
+    %{article_with_tag: article}
+  end
+
   describe "Index" do
-    setup [:create_article]
+    setup [:create_article, :create_article_with_tag]
 
     test "lists all articles", %{conn: conn, article: article} do
       {:ok, _index_live, html} = live(conn, ~p"/articles")
 
       assert html =~ "Listing Articles"
       assert html =~ article.body
+    end
+
+    test "searches articles by tag", %{conn: conn, article: article, article_with_tag: article_with_tag} do
+      {:ok, index_live, _html} = live(conn, ~p"/articles")
+
+      index_live |> element("a", "test") |> render_click()
+      assert_redirect(index_live, ~p"/articles?tag=test")
+
+      {:ok, _index_live, html} = live(conn, ~p"/articles?tag=test")
+
+      refute html =~ "/articles/#{article.id}"
+      assert html =~ "/articles/#{article_with_tag.id}"
     end
 
     test "saves new article", %{conn: conn} do
